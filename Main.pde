@@ -98,6 +98,9 @@ final float CUSTO_PARADO = 2;
 
 Ilha[] ilhas;
 Grafo grafo;
+Jogador jogador;
+Interface painel;
+Sprites sprites;
 
 void settings() {
   size(LARGURA_TELA, ALTURA_TELA);
@@ -105,16 +108,33 @@ void settings() {
 
 void setup() {
   criarMapa();
+  jogador = new Jogador(grafo, ILHA_GIRASSOL);
+  painel = new Interface();
+  sprites = new Sprites();
 }
 
 void draw() {
   background(COR_FUNDO_R, COR_FUNDO_G, COR_FUNDO_B);
 
   grafo.desenhar();
+  sprites.desenharCorrentes(grafo);
 
   for (Ilha ilha : ilhas) {
     ilha.desenhar();
   }
+  sprites.desenharRecursos(grafo, jogador);
+  jogador.desenhar();
+
+  painel.desenhar(jogador, null, -1);
+  sprites.desenharLegenda(width - 370, 46);
+}
+
+void mousePressed() {
+  jogador.clicar(mouseX, mouseY, mouseButton);
+}
+
+void keyPressed() {
+  jogador.tecla(key);
 }
 
 void criarMapa() {
