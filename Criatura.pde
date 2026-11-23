@@ -13,12 +13,17 @@ class Criatura {
   
   boolean viva;
   
+  int polinizacoes;   // usado na avaliação (aptidão)
+  int recarga;        // quadros até poder polinizar de novo
+  
   Criatura(DNA dna_, Ilha ilha) {
     this.x = ilha.x;
     this.y = ilha.y;
     this.dna = dna_;
     this.energia = ENERGIA;
     this.viva = true;
+    this.polinizacoes = 0;
+    this.recarga = 0;
     
     this.ilhaAtual = ilha;
     this.ilhaDestino = ilha;
@@ -40,7 +45,8 @@ class Criatura {
     for(Ilha ilha : ilhas) {
       PVector posicaoIlha = new PVector(ilha.x, ilha.y);
       
-      if(posicaoCriatura.dist(posicaoIlha) < percepcao && ilha.pendentes() > 0) {   
+      // só considera ilhas despertas com flores pendentes
+      if(posicaoCriatura.dist(posicaoIlha) < percepcao && ilha.precisaPolinizacao()) {   
         ArrayList<Integer> caminhoCandidato = grafo.menorCaminho(ilhaAtual.id, ilha.id);   
         int distancia = grafo.custoCaminho(caminhoCandidato);
         
@@ -59,11 +65,15 @@ class Criatura {
     
     if(!viva) return;
     
+    // só troca de ilha atual se ela faz parte do caminho (evita confusão
+    // quando a linha da corrente cruza outra ilha)
     for(Ilha ilha : ilhas) {
-      if(ilha.contem(x, y)) ilhaAtual = ilha;
+      if(ilha.contem(x, y) && (caminho.isEmpty() || caminho.contains(ilha.id))) {
+        ilhaAtual = ilha;
+      }
     }
     
-    if(this.ilhaDestino.pendentes() == 0 && ilhaAtual.contem(x, y)) {
+    if(!this.ilhaDestino.precisaPolinizacao() && ilhaAtual.contem(x, y)) {
       procurarIlha(ilhas);
     }
     
@@ -71,10 +81,8 @@ class Criatura {
       mover();
     } else {
       energia -= CUSTO_PARADO;    
-      // coleta de flores (não é minha parte)
+      polinizar();
     }
-    
-    // this.desenhar(x, y);
     
     if(this.energia <= 0) {
       this.viva = false;
@@ -82,13 +90,28 @@ class Criatura {
 
   }
   
+  // coleta de flores: poliniza a ilha atual e ganha néctar (energia)
+  void polinizar() {
+    if(recarga > 0) {
+      recarga--;
+      return;
+    }
+    
+    if(ilhaAtual.polinizar()) {
+      polinizacoes++;
+      energia = min(ENERGIA, energia + NECTAR_POR_POLINIZACAO);
+      recarga = RECARGA_POLINIZACAO;
+    }
+  }
+  
   void mover() {
-    int posicaoCaminho = 0;
-      
-    for(int i = 0; i < caminho.size(); i++) {
-      if(caminho.get(i) == ilhaAtual.id) {
-        posicaoCaminho = i;
-      }
+    int posicaoCaminho = caminho.indexOf(ilhaAtual.id);
+    
+    // caminho inválido: desiste e procura outro destino
+    if(posicaoCaminho < 0 || posicaoCaminho + 1 >= caminho.size()) {
+      ilhaDestino = ilhaAtual;
+      caminho = new ArrayList<Integer>();
+      return;
     }
       
     Ilha proximaIlha = ilhas[caminho.get(posicaoCaminho + 1)];
@@ -104,8 +127,24 @@ class Criatura {
     this.x = proximaPosicao.x;
     this.y = proximaPosicao.y;
     
-    float custoEnergia = grafo.matrizAdjacencia[ilhaAtual.id][proximaIlha.id] * (1 - eficiencia);
+    float custoEnergia = grafo.matrizAdjacencia[ilhaAtual.id][proximaIlha.id]
+                         * (1 - eficiencia) * FATOR_CUSTO_MOVIMENTO;
     energia -= custoEnergia;
+  }
+  
+  // a cor da criatura reflete seus genes (R = velocidade, G = eficiência, B = percepção)
+  void desenhar() {
+    pushStyle();
+    noStroke();
+    if(viva) {
+      fill(120 + dna.genes[GENE_VELOCIDADE] * 135,
+           120 + dna.genes[GENE_EFICIENCIA] * 135,
+           120 + dna.genes[GENE_PERCEPCAO] * 135);
+    } else {
+      fill(120, 120, 120, 100);
+    }
+    ellipse(x, y, RAIO_CRIATURA * 2, RAIO_CRIATURA * 2);
+    popStyle();
   }
   
 }
