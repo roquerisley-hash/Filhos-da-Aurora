@@ -51,6 +51,21 @@ class Grafo {
     }
   }
 
+  // desperta todas as ilhas ligadas (por correntes existentes) a uma ilha
+  void despertarVizinhas(int ilha) {
+
+    if (!indiceValido(ilha)) {
+      return;
+    }
+
+    for (int i = 0; i < qtd; i++) {
+
+      if (matrizPossivel[ilha][i] > SEM_CORRENTE) {
+        despertarIlha(i);
+      }
+    }
+  }
+
   // verifica se uma corrente pode ser restaurada
   boolean correnteRestauravel(int a, int b) {
 
