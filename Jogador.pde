@@ -7,12 +7,16 @@ class Jogador {
   private int ilhaAtual;
   private int luz;
   private boolean[] luzColetada;
+  private PImage guardiao;
+  private int ilhaDoPlantio = SEM_ILHA;
+  private int quadroDoPlantio;
   private String mensagem = "Explore as ilhas despertas para coletar luz.";
 
   Jogador(Grafo mapa, int ilhaInicial) {
     this.mapa = mapa;
     ilhaAtual = ilhaInicial;
     luzColetada = new boolean[mapa.qtd];
+    guardiao = loadImage("guardiao.png");
   }
 
   int getLuz() {
@@ -62,8 +66,16 @@ class Jogador {
     return true;
   }
 
+  boolean temLuzNaIlha(int indice) {
+    return mapa.ilhas[indice].desbloqueada && !luzColetada[indice];
+  }
+
+  boolean plantouAgora(int indice) {
+    return ilhaDoPlantio == indice && frameCount - quadroDoPlantio < 24;
+  }
+
   boolean coletarLuz() {
-    if (!getIlha().desbloqueada || luzColetada[ilhaAtual]) {
+    if (!temLuzNaIlha(ilhaAtual)) {
       mensagem = "Não há luz disponível nesta ilha.";
       return false;
     }
@@ -84,6 +96,8 @@ class Jogador {
       return false;
     }
     ilha.flores++;
+    ilhaDoPlantio = ilhaAtual;
+    quadroDoPlantio = frameCount;
     luz -= CUSTO_FLOR;
     mensagem = "Flor plantada em " + ilha.nome + ".";
     return true;
@@ -110,6 +124,13 @@ class Jogador {
   void desenhar() {
     Ilha ilha = getIlha();
     pushStyle();
+    if (guardiao != null && guardiao.height > 0) {
+      imageMode(CENTER);
+      noTint();
+      image(guardiao, ilha.x, ilha.y - 11, 36.0f * guardiao.width / guardiao.height, 36);
+      popStyle();
+      return;
+    }
     ellipseMode(CENTER);
     stroke(62, 44, 23);
     strokeWeight(2);
