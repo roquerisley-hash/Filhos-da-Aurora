@@ -86,6 +86,15 @@ final int COR_CORRENTE_INATIVA_R = 150;
 final int COR_CORRENTE_INATIVA_G = 165;
 final int COR_CORRENTE_INATIVA_B = 180;
 
+// CONSTANTES DA CRIATURA
+
+final float ENERGIA = 100;
+
+final int GENE_VELOCIDADE = 0;
+final int GENE_PERCEPCAO = 1;
+final int GENE_EFICIENCIA = 2;
+
+final float CUSTO_PARADO = 2;
 
 Ilha[] ilhas;
 Grafo grafo;
