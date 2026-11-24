@@ -19,7 +19,7 @@ class Sprites {
       if (jogador.temLuzNaIlha(i)) {
         luz(ilha.x + 28, ilha.y + 8 + balanco);
       }
-      if (ilha.desbloqueada && ilha.pendentes() > 0) {
+      if (ilha.precisaPolinizacao()) {
         flor(ilha.x - 27, ilha.y + 8, jogador.plantouAgora(i) ? 1.3f : 1);
       }
     }

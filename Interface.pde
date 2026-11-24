@@ -36,9 +36,9 @@ class Interface {
     }
 
     text("Clique esquerdo: viajar por corrente ativa  |  E: coletar luz  |  F: plantar flor ("
-      + jogador.CUSTO_FLOR + " de luz)", 32, height - 90);
+      + CUSTO_FLOR_AMBIENTE + " de luz)", 32, height - 90);
     text("Clique direito na ilha de destino: restaurar corrente entre ilhas despertas ("
-      + jogador.CUSTO_RESTAURACAO + " de luz)", 32, height - 69);
+      + CUSTO_RESTAURACAO_AMBIENTE + " de luz)", 32, height - 69);
 
     fill(255, 221, 121);
     text(jogador.getMensagem(), 32, height - 44);

@@ -1,21 +1,17 @@
 class Jogador {
-  final int CUSTO_FLOR = 3;
-  final int CUSTO_RESTAURACAO = 5;
-  final int LUZ_POR_ILHA = 8;
-
   private Grafo mapa;
+  private Ambiente ambiente;
   private int ilhaAtual;
   private int luz;
-  private boolean[] luzColetada;
   private PImage guardiao;
   private int ilhaDoPlantio = SEM_ILHA;
   private int quadroDoPlantio;
   private String mensagem = "Explore as ilhas despertas para coletar luz.";
 
-  Jogador(Grafo mapa, int ilhaInicial) {
+  Jogador(Grafo mapa, int ilhaInicial, Ambiente ambiente) {
     this.mapa = mapa;
+    this.ambiente = ambiente;
     ilhaAtual = ilhaInicial;
-    luzColetada = new boolean[mapa.qtd];
     guardiao = loadImage("guardiao.png");
   }
 
@@ -67,7 +63,7 @@ class Jogador {
   }
 
   boolean temLuzNaIlha(int indice) {
-    return mapa.ilhas[indice].desbloqueada && !luzColetada[indice];
+    return ambiente.temLuzNaIlha(indice);
   }
 
   boolean plantouAgora(int indice) {
@@ -75,31 +71,29 @@ class Jogador {
   }
 
   boolean coletarLuz() {
-    if (!temLuzNaIlha(ilhaAtual)) {
+    int coletada = ambiente.coletarLuz(ilhaAtual);
+    if (coletada <= 0) {
       mensagem = "Não há luz disponível nesta ilha.";
       return false;
     }
-    luzColetada[ilhaAtual] = true;
-    luz += LUZ_POR_ILHA;
-    mensagem = "Você coletou " + LUZ_POR_ILHA + " de luz.";
+    luz += coletada;
+    mensagem = "Você coletou " + coletada + " de luz.";
     return true;
   }
 
   boolean plantarFlor() {
-    Ilha ilha = getIlha();
-    if (!ilha.desbloqueada) {
+    if (luz < CUSTO_FLOR_AMBIENTE) {
+      mensagem = "Plantar uma flor custa " + CUSTO_FLOR_AMBIENTE + " de luz.";
+      return false;
+    }
+    if (!ambiente.plantarFlor(ilhaAtual)) {
       mensagem = "A ilha precisa despertar para receber flores.";
       return false;
     }
-    if (luz < CUSTO_FLOR) {
-      mensagem = "Plantar uma flor custa " + CUSTO_FLOR + " de luz.";
-      return false;
-    }
-    ilha.flores++;
     ilhaDoPlantio = ilhaAtual;
     quadroDoPlantio = frameCount;
-    luz -= CUSTO_FLOR;
-    mensagem = "Flor plantada em " + ilha.nome + ".";
+    luz -= CUSTO_FLOR_AMBIENTE;
+    mensagem = "Flor plantada em " + getIlha().nome + ".";
     return true;
   }
 
@@ -108,15 +102,15 @@ class Jogador {
       mensagem = "A corrente precisa existir, estar inativa e ligar ilhas despertas.";
       return false;
     }
-    if (luz < CUSTO_RESTAURACAO) {
-      mensagem = "Restaurar uma corrente custa " + CUSTO_RESTAURACAO + " de luz.";
+    if (luz < CUSTO_RESTAURACAO_AMBIENTE) {
+      mensagem = "Restaurar uma corrente custa " + CUSTO_RESTAURACAO_AMBIENTE + " de luz.";
       return false;
     }
     if (!mapa.ativarCorrente(ilhaAtual, destino)) {
       mensagem = "A corrente não pôde ser restaurada.";
       return false;
     }
-    luz -= CUSTO_RESTAURACAO;
+    luz -= CUSTO_RESTAURACAO_AMBIENTE;
     mensagem = "Corrente restaurada até " + mapa.ilhas[destino].nome + ".";
     return true;
   }
