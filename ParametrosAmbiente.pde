@@ -1,0 +1,32 @@
+final int DURACAO_GERACAO = 600;
+final float PONTOS_POR_POLINIZACAO = 10;
+final float PONTOS_POR_ENERGIA = 5;
+
+final int LUZ_POR_ILHA_AMBIENTE = 8;
+final int CUSTO_FLOR_AMBIENTE = 3;
+final int CUSTO_RESTAURACAO_AMBIENTE = 5;
+
+final float NECTAR_POR_POLINIZACAO = 20;
+final int RECARGA_POLINIZACAO = 8;
+final float FATOR_CUSTO_MOVIMENTO = 0.03f;
+final float RAIO_CRIATURA = 6;
+
+final float PASSO_MUTACAO = 0.1f;
+
+final int COR_ILHA_DESPERTA_R = 91;
+final int COR_ILHA_DESPERTA_G = 178;
+final int COR_ILHA_DESPERTA_B = 142;
+
+final int COR_ILHA_ADORMECIDA_R = 89;
+final int COR_ILHA_ADORMECIDA_G = 104;
+final int COR_ILHA_ADORMECIDA_B = 151;
+
+final int COR_BARRA_FUNDO_R = 39;
+final int COR_BARRA_FUNDO_G = 54;
+final int COR_BARRA_FUNDO_B = 95;
+
+final int COR_BARRA_PROGRESSO_R = 255;
+final int COR_BARRA_PROGRESSO_G = 218;
+final int COR_BARRA_PROGRESSO_B = 114;
+
+final int ALTURA_BARRA = 7;
